@@ -1,0 +1,8 @@
+Django>=5
+djangorestframework
+python-dotenv
+dnspython
+validate_email
+psycopg2-binary
+requests
+gunicorn
