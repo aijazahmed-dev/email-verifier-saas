@@ -25,6 +25,9 @@ urlpatterns = [
     
     ##### user related path##########################
     path('accounts/', include('accounts.urls')),
+
+    ##### Verifier related path##########################
+    path('verifier/', include('verifier.urls')),
     
 
 

@@ -1,0 +1,31 @@
+<h2>Email Verification Tool</h2>
+<form method="post">
+    {% csrf_token %}
+    <textarea name="emails" rows="5" placeholder="Enter one or more emails, separated by comma, space, or new line">{{ emails_input }}</textarea>
+    <br>
+    <button type="submit">Verify</button>
+</form>
+
+{% if results %}
+    <h3>Verification Results:</h3>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Email</th>
+            <th>Syntax Valid</th>
+            <th>Has MX</th>
+            <th>Disposable</th>
+            <th>Role Account</th>
+            <th>Can Receive Email</th>
+        </tr>
+        {% for r in results %}
+        <tr>
+            <td>{{ r.email }}</td>
+            <td>{{ r.syntax_valid }}</td>
+            <td>{{ r.has_mx }}</td>
+            <td>{{ r.is_disposable }}</td>
+            <td>{{ r.is_role }}</td>
+            <td>{{ r.deliverable }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}

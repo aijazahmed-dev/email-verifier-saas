@@ -15,6 +15,9 @@ import sys
 from dotenv import load_dotenv
 import os
 
+# load environment variables from .env
+load_dotenv() 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +31,7 @@ sys.path.append(str(BASE_DIR / "apps"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-cyum#7e#!^c_8i7whl2_0)ev+uwt1lmnx_^#iy)(pdku-sdmp$'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -133,20 +137,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# load environment variables from .env
-load_dotenv() 
-
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
-
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # Rediret logout user to login page
 LOGOUT_REDIRECT_URL = 'login' 

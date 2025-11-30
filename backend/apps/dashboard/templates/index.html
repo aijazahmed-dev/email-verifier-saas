@@ -5,8 +5,10 @@
             {% csrf_token %}
             <button type="submit">Logout</button>
         </form>
+        <a href="{% url 'emails_check' %}">Email Verifier</a>
     {% else %}
         <a href="{% url 'login' %}">Login</a>
         <a href="{% url 'register' %}">Register</a>
+        <a href="{% url 'emails_check' %}">Email Verifier</a>
     {% endif %}
 </nav>
