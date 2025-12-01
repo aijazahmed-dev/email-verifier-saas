@@ -1,0 +1,13 @@
+<h2>Bulk Email Verification</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Verify Emails</button>
+</form>
+
+{% if results %}
+    <h3>Results:</h3>
+    <a href="{% url 'download_bulk_results' %}">Download CSV</a>
+{% endif %}
+
