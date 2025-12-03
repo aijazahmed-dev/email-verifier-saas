@@ -1,12 +1,14 @@
 from django.shortcuts import render
-from .engine.verify_engine import verify, normalize_email, map_to_yes_no
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import UploadCSVForm
 import pandas as pd
+from .engine.verify_engine import verify, normalize_email, map_to_yes_no
+from django_ratelimit.decorators import ratelimit
 
 # Create your views here.
 @login_required
+@ratelimit(key='user', rate='10/m', block=True)
 def emails_check(request):
     results = []
     emails_input = ""
@@ -36,6 +38,7 @@ def emails_check(request):
 
 # Bulk email check with CSV upload/download
 @login_required
+@ratelimit(key='user', rate='6/m', block=True)
 def bulk_csv_check_view(request):
     results = []
     form = UploadCSVForm()
