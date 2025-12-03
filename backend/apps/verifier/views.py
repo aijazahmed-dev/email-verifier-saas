@@ -3,8 +3,10 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import UploadCSVForm
 import pandas as pd
-from .engine.verify_engine import verify, normalize_email, map_to_yes_no
+from django.core.paginator import Paginator
 from django_ratelimit.decorators import ratelimit
+from .engine.verify_engine import verify, normalize_email, map_to_yes_no
+from .models import EmailVerificationLog
 
 # Create your views here.
 @login_required
@@ -29,6 +31,17 @@ def emails_check(request):
         "deliverable": map_to_yes_no(result["deliverable"]),
 
         })
+            
+        # Save to logs
+        EmailVerificationLog.objects.create(
+            user=request.user,
+            email=email,
+            syntax_valid=result["syntax_valid"],
+            has_mx=result["has_mx"],
+            is_disposable=result["is_disposable"],
+            is_role=result["is_role"],
+            deliverable=result["deliverable"]
+        )
 
     return render(request, "verifier/emails_check.html", {
         "emails_input": emails_input,
@@ -73,6 +86,17 @@ def bulk_csv_check_view(request):
                     "is_role": map_to_yes_no(result["is_role"]),
                     "deliverable": map_to_yes_no(result["deliverable"]),
                 })
+
+                # Save to logs
+                EmailVerificationLog.objects.create(
+                user=request.user,
+                email=email,
+                syntax_valid=result["syntax_valid"],
+                has_mx=result["has_mx"],
+                is_disposable=result["is_disposable"],
+                is_role=result["is_role"],
+                deliverable=result["deliverable"]
+            )
             
             # Save results for download
             df_result = pd.DataFrame(data)
@@ -97,3 +121,14 @@ def download_bulk_results(request):
     response['Content-Disposition'] = 'attachment; filename="email_verification_results.csv"'
     df.to_csv(path_or_buf=response, index=False)
     return response
+
+# View to list the logs for the logged-in user
+@login_required
+def verification_history(request):
+    logs_list = EmailVerificationLog.objects.filter(user=request.user).order_by('-timestamp')
+    
+    paginator = Paginator(logs_list, 20)  # Show 20 logs per page
+    page_number = request.GET.get('page')  # Get page number from URL
+    page_obj = paginator.get_page(page_number)  # Get logs for the requested page
+
+    return render(request, "verifier/history.html", {"page_obj": page_obj})
