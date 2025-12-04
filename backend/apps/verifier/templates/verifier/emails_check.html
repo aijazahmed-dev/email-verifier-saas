@@ -1,4 +1,5 @@
 <h2>Email Verification Tool</h2>
+<h3>Remaining Credits: {{ request.user.usercredits.credits }}</h3>
 <form method="post">
     {% csrf_token %}
     <textarea name="emails" rows="5" placeholder="Enter one or more emails, separated by comma, space, or new line">{{ emails_input }}</textarea>

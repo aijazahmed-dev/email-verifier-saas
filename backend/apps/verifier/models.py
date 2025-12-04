@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
+# Logs and history model
 class EmailVerificationLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     email = models.EmailField()
@@ -14,3 +14,11 @@ class EmailVerificationLog(models.Model):
 
     def __str__(self):
         return f"{self.email} by {self.user.username} at {self.timestamp}"
+    
+# User Credits Models
+class UserCredits(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    credits = models.IntegerField(default=2)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.credits} Credits"

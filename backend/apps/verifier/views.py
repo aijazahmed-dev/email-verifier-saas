@@ -6,12 +6,16 @@ import pandas as pd
 from django.core.paginator import Paginator
 from django_ratelimit.decorators import ratelimit
 from .engine.verify_engine import verify, normalize_email, map_to_yes_no
-from .models import EmailVerificationLog
+from .models import EmailVerificationLog, UserCredits
 
 # Create your views here.
 @login_required
 @ratelimit(key='user', rate='10/m', block=True)
 def emails_check(request):
+    user_credits = UserCredits.objects.get(user=request.user)
+    if user_credits.credits <= 0:
+        return HttpResponse("You have no credits left. Please buy more credits.", status=402)
+    
     results = []
     emails_input = ""
 
@@ -43,6 +47,10 @@ def emails_check(request):
             deliverable=result["deliverable"]
         )
 
+        # Deduct credits after verifiying emails
+        user_credits.credits -= len(emails)   # subtract total used
+        user_credits.save()
+
     return render(request, "verifier/emails_check.html", {
         "emails_input": emails_input,
         "results": results
@@ -53,6 +61,10 @@ def emails_check(request):
 @login_required
 @ratelimit(key='user', rate='6/m', block=True)
 def bulk_csv_check_view(request):
+    user_credits = UserCredits.objects.get(user=request.user)
+    if user_credits.credits <= 0:
+        return HttpResponse("You have no credits left. Please buy more credits.", status=402)
+    
     results = []
     form = UploadCSVForm()
     
@@ -102,6 +114,10 @@ def bulk_csv_check_view(request):
             df_result = pd.DataFrame(data)
             request.session['bulk_results'] = df_result.to_json()  # store temporarily in session
             results = data
+
+        # Deduct credits after verifiying emails
+        user_credits.credits -= len(emails)   # subtract total used
+        user_credits.save()
 
     return render(request, "verifier/bulk_csv_check.html", {
         "form": form,
