@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Logs and history model
 class EmailVerificationLog(models.Model):
@@ -15,10 +16,25 @@ class EmailVerificationLog(models.Model):
     def __str__(self):
         return f"{self.email} by {self.user.username} at {self.timestamp}"
     
-# User Credits Models
-class UserCredits(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    credits = models.IntegerField(default=2)
+# User Plans Models
+class Plan(models.Model):
+    name = models.CharField(max_length=50)  
+    price = models.IntegerField(default=0)  # PKR
+    credits = models.IntegerField(default=0)
+    is_monthly = models.BooleanField(default=False)  # Free plan = True
+    daily_limit = models.IntegerField(default=0)  # Free plan = 20, others = 0 (no limit)
 
     def __str__(self):
-        return f"{self.user.username} - {self.credits} Credits"
+        return self.name
+
+
+class UserPlan(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, null=True)
+    credits_remaining = models.IntegerField(default=0)
+    daily_used = models.IntegerField(default=0)
+    last_daily_reset = models.DateField(default=timezone.now)
+    last_monthly_reset = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.plan.name}"

@@ -1,5 +1,10 @@
 <h2>Bulk Email Verification</h2>
-<h3>Remaining Credits: {{ request.user.usercredits.credits }}</h3>
+<h3>Remaining Credits: {{ request.user.user_plan.credits_remaining }}</h3>
+<h3>Plan: {{ request.user.user_plan.plan }}</h3>
+{% if request.user.userplan.plan.is_monthly %}
+    <p>Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</p>
+{% endif %}
+
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}

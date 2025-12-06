@@ -1,5 +1,10 @@
 <h2>Email Verification Tool</h2>
-<h3>Remaining Credits: {{ request.user.usercredits.credits }}</h3>
+<p>Plan: {{ request.user.userplan.plan.name }}<p>
+<p>Remaining Credits: {{ request.user.userplan.credits_remaining }}<p>
+{% if request.user.userplan.plan.is_monthly %}
+    <p>Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</p>
+{% endif %}
+
 <form method="post">
     {% csrf_token %}
     <textarea name="emails" rows="5" placeholder="Enter one or more emails, separated by comma, space, or new line">{{ emails_input }}</textarea>
