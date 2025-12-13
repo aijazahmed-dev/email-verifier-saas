@@ -35,6 +35,7 @@ class UserPlan(models.Model):
     daily_used = models.IntegerField(default=0)
     last_daily_reset = models.DateField(default=timezone.now)
     last_monthly_reset = models.DateField(default=timezone.now)
+    expiry_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.plan.name}"

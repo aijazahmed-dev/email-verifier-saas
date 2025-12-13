@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib import admin
-from .models import EmailVerificationLog, UserPlan
+from .models import EmailVerificationLog, UserPlan, Plan
 
 # Register Logs Model
 @admin.register(EmailVerificationLog)
@@ -11,3 +11,5 @@ class EmailVerificationLogAdmin(admin.ModelAdmin):
 
 # User Credits Model
 admin.site.register(UserPlan)
+
+admin.site.register(Plan)

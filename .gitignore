@@ -31,3 +31,4 @@ data/
 docker-compose.yml
 media/
 staticfiles/
+node_modules

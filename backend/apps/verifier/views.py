@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import UploadCSVForm
 import pandas as pd
+from django.utils import timezone
 from django.core.paginator import Paginator
 from django_ratelimit.decorators import ratelimit
 from .engine.verify_engine import verify, normalize_email, map_to_yes_no
@@ -15,13 +16,15 @@ from .utils_plans import reset_user_credits
 def emails_check(request):
     user_plan = UserPlan.objects.get(user=request.user)
     
+    today = timezone.now().date()
+
     # Reset daily + monthly credits
     reset_user_credits(user_plan)
 
-    # If free plan, check daily limit
-    if user_plan.plan.is_monthly:
-        if user_plan.daily_used >= user_plan.plan.daily_limit:
-            return HttpResponse("Daily limit reached. Try tomorrow.", status=429)
+    # Expiry check for Basic/Pro
+    if user_plan.expiry_date and today > user_plan.expiry_date:
+        return HttpResponse("Your plan has expired. Please buy a new package.", status=402)
+
     
     # Check credits
     if user_plan.credits_remaining <= 0:
@@ -32,8 +35,13 @@ def emails_check(request):
 
     if request.method == "POST":
         emails_input = request.POST.get("emails", "")
+        
         # Split by comma, space, or new line
         emails = [normalize_email(e) for e in emails_input.replace(",", "\n").splitlines() if e.strip()]
+        
+        # Check daily limit for any plan with a limit
+        if user_plan.plan.daily_limit > 0 and user_plan.daily_used + len(emails) > user_plan.plan.daily_limit:
+            return HttpResponse("Daily limit reached.", status=429)
         
         # Check if user has enough credits
         if len(emails) > user_plan.credits_remaining:
@@ -51,6 +59,12 @@ def emails_check(request):
 
         })
             
+        # Pagination
+        page_number = request.GET.get('page', 1)  # get page from URL, default 1
+        paginator = Paginator(results, 10)        # 10 results per page
+        page_obj = paginator.get_page(page_number)
+
+            
         # Save to logs
         EmailVerificationLog.objects.create(
             user=request.user,
@@ -65,15 +79,15 @@ def emails_check(request):
         # Deduct credits after verifiying emails
         user_plan.credits_remaining -= len(emails)
 
-        # Count daily usage (only free plan)
-        if user_plan.plan.is_monthly:
+        # Count daily usage 
+        if user_plan.plan.daily_limit > 0:
             user_plan.daily_used += len(emails)
 
         user_plan.save()
 
     return render(request, "verifier/emails_check.html", {
         "emails_input": emails_input,
-        "results": results
+        "page_obj": page_obj
     })
 
 
@@ -83,18 +97,10 @@ def emails_check(request):
 def bulk_csv_check_view(request):
     user_plan = UserPlan.objects.get(user=request.user)
     
+    today = timezone.now().date()
+    
     # Reset daily + monthly credits
     reset_user_credits(user_plan)
-
-    # If free plan, check daily limit
-    if user_plan.plan.is_monthly:
-        if user_plan.daily_used >= user_plan.plan.daily_limit:
-            return HttpResponse("Daily limit reached. Try tomorrow.", status=429)
-    
-    # Check credits
-    if user_plan.credits_remaining <= 0:
-        return HttpResponse("You have no credits left. Please buy more credits.", status=402)
-    
 
     results = []
     form = UploadCSVForm()
@@ -115,6 +121,14 @@ def bulk_csv_check_view(request):
                 emails = df['email'].dropna().tolist()
             else:
                 emails = df.iloc[:,0].dropna().tolist()
+
+            # Check plan expiry
+            if user_plan.expiry_date and today > user_plan.expiry_date:
+                return HttpResponse("Your plan has expired. Please buy a new package.", status=402)
+        
+            # Check daily limit
+            if user_plan.plan.daily_limit > 0 and user_plan.daily_used + len(emails) > user_plan.plan.daily_limit:
+                return HttpResponse("Daily limit reached.", status=429)
             
             # Check if user has enough credits
             if len(emails) > user_plan.credits_remaining:
@@ -143,21 +157,21 @@ def bulk_csv_check_view(request):
                 is_disposable=result["is_disposable"],
                 is_role=result["is_role"],
                 deliverable=result["deliverable"]
-            )
+                )
             
-        # Save results for download
-        df_result = pd.DataFrame(data)
-        request.session['bulk_results'] = df_result.to_json()  # store temporarily in session
-        results = data
+            # Save results for download
+            df_result = pd.DataFrame(data)
+            request.session['bulk_results'] = df_result.to_json()  # store temporarily in session
+            results = data
 
-        # Deduct credits after verifiying emails
-        user_plan.credits_remaining -= len(emails)
+            # Deduct credits after verifiying emails
+            user_plan.credits_remaining -= len(emails)
 
-        # Count daily usage (only free plan)
-        if user_plan.plan.is_monthly:
-            user_plan.daily_used += len(emails)
+            # Count daily usage (only free plan)
+            if user_plan.plan.daily_limit > 0:
+                user_plan.daily_used += len(emails)
 
-        user_plan.save()
+            user_plan.save()
 
     return render(request, "verifier/bulk_csv_check.html", {
         "form": form,

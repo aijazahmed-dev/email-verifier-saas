@@ -23,7 +23,7 @@
             <th>Role Account</th>
             <th>Can Receive Email</th>
         </tr>
-        {% for r in results %}
+        {% for r in page_obj %}
         <tr>
             <td>{{ r.email }}</td>
             <td>{{ r.syntax_valid }}</td>
@@ -35,3 +35,17 @@
         {% endfor %}
     </table>
 {% endif %}
+
+<!-- Pagination controls -->
+<div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
+
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</div>
+

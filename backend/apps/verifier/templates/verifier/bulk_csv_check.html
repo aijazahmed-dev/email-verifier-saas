@@ -1,6 +1,6 @@
 <h2>Bulk Email Verification</h2>
-<h3>Remaining Credits: {{ request.user.user_plan.credits_remaining }}</h3>
-<h3>Plan: {{ request.user.user_plan.plan }}</h3>
+<p>Plan: {{ request.user.userplan.plan.name }}<p>
+<p>Remaining Credits: {{ request.user.userplan.credits_remaining }}<p>
 {% if request.user.userplan.plan.is_monthly %}
     <p>Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</p>
 {% endif %}

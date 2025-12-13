@@ -21,14 +21,18 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     ##### Dashboard related path##########################
-    path('', include('dashboard.urls')),
+    path('dashboared/', include('dashboard.urls')),
     
     ##### user related path##########################
     path('accounts/', include('accounts.urls')),
 
     ##### Verifier related path##########################
     path('verifier/', include('verifier.urls')),
-    
+
+    ##### Pages related path##########################
+    path('', include('pages.urls')),
 
 
+    #### For auto reload tailwind
+    path("__reload__/", include("django_browser_reload.urls")),
 ]

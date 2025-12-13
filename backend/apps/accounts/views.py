@@ -11,7 +11,6 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.contrib import messages
 
 
 
@@ -39,11 +38,17 @@ def register(request):
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[email],
                 fail_silently=False,
-)
-            return redirect('login')
+            )
+
+            return redirect('registration_success')
+           
     else:
         form = CustomUserCreationForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+# Resitration Success View
+def registration_success(request):
+    return render(request, "accounts/registration_success.html")
 
 
 # Activation View
