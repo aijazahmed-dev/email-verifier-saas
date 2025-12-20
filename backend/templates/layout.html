@@ -1,7 +1,7 @@
 {% load static tailwind_tags %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,10 +42,10 @@
             md:static md:flex md:bg-transparent md:shadow-none md:h-auto md:w-auto md:flex-row md:gap-6">
 
             <ul class="flex flex-col md:flex-row gap-5 md:gap-5 container mx-auto px-4 max-w-[1100px]">
-                <li><a href="#" class="font-medium hover:text-blue-700 duration-300">Home</a></li>
+                <li><a href="{% url 'home' %}" class="font-medium hover:text-blue-700 duration-300 {% if request.path == '/' %}text-blue-700{% else %}text-black{% endif %}">Home</a></li>
 
                 <li class="relative group">
-                    <a href="#" class="font-medium flex items-center hover:text-blue-700 duration-300">
+                    <a href="#" class="font-medium flex items-center hover:text-blue-700 duration-300 {% if request.path == '/tools/' %}text-blue-700{% else %}text-black{% endif %}">
                         Tools
                         <svg class="w-5 h-5 ml-1 text-current" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
@@ -57,8 +57,8 @@
                     </ul>
                 </li>
 
-                <li><a href="#" class="font-medium hover:text-blue-700 duration-300">Pricing</a></li>
-                <li><a href="#" class="font-medium hover:text-blue-700 duration-300">Contact</a></li>
+                <li><a href="{% url 'home' %}#pricing" class="font-medium hover:text-blue-700 duration-300">Pricing</a></li>
+                <li><a href="{% url 'contact' %}" class="font-medium hover:text-blue-700 duration-300 {% if request.path == '/contact/' %}text-blue-700{% else %}text-black{% endif %}">Contact</a></li>
                 <li><a href="#" class="font-medium border border-gray-500 px-3 py-1.5 rounded hover:bg-gray-300 duration-300">Sign in</a></li>
                 <li><a href="#" class="font-medium px-3 py-2 mt-4 md:mt-0 rounded text-white bg-blue-700 hover:bg-blue-400 duration-300">Sign up</a></li>
             </ul>
@@ -71,15 +71,15 @@
 
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-10">
+    <main class="px-4 py-10">
         {% block content %}
-        <!-- Page-specific content goes here -->
+        
         {% endblock %}
     </main>
 
     <!-- Footer -->
     <footer>
-        <div class="flex flex-col items-center h-auto bg-blue-500 md:justify-center md:flex-row md:h-90">
+        <div class="flex flex-col items-center h-auto bg-blue-950 md:justify-center md:flex-row md:h-90">
             <div class="flex flex-col items-center w-auto md:w-[25%] mt-10 md:mt-0">
                 <img src="{% static 'images/logo.png' %}" alt="Email Verifier Logo" class="mb-2">
                 <p class="text-sm px-10 md:px-0 text-white text-center font-medium">
@@ -88,21 +88,21 @@
             </div>
             <div class="w-auto md:w-[25%] ml-0 mt-10 md:mt-0 md:ml-20">
                 <ul class="text-center text-white">
-                    <li><a href="#" class="font-medium hover:text-blue-950 text whiduration-300">Privacy Policy</a></li>
-                    <li><a href="#" class="font-medium hover:text-blue-950 duration-300">About us</a></li>
-                    <li><a href="#" class="font-medium hover:text-blue-950 duration-300">Contact us</a></li>
-                    <li><a href="#" class="font-medium hover:text-blue-950 duration-300">Cookie Policy</a></li>
+                    <li><a href="{% url 'privacy' %}" class="font-medium hover:text-blue-400 text whiduration-300">Privacy Policy</a></li>
+                    <li><a href="{% url 'about' %}" class="font-medium hover:text-blue-400 duration-300">About us</a></li>
+                    <li><a href="{% url 'contact' %}" class="font-medium hover:text-blue-400 duration-300">Contact us</a></li>
+                    <li><a href="{% url 'cookie' %}" class="font-medium hover:text-blue-400 duration-300">Cookie Policy</a></li>
                 </ul>
             </div>
             <div class="w-auto md:w-[25%] text-center mt-10 mb-10 md:mt-0 md:mb-0">
                 <p class="text-white font-medium">Follow us on</p>
-                <a href="#" class="text-white text-2xl hover:text-blue-700 duration-200"><i class="fa-brands fa-square-twitter"></i></a>
-                <a href="#" class="text-white text-2xl hover:text-blue-700 duration-200"><i class="fa-brands fa-square-linkedin"></i></a>
-                <a href="#" class="text-white text-2xl hover:text-blue-700 duration-200"><i class="fa-brands fa-square-instagram"></i></a>
+                <a href="#" class="text-white text-2xl hover:text-blue-400 duration-200"><i class="fa-brands fa-square-twitter"></i></a>
+                <a href="#" class="text-white text-2xl hover:text-blue-400 duration-200"><i class="fa-brands fa-square-linkedin"></i></a>
+                <a href="#" class="text-white text-2xl hover:text-blue-400 duration-200"><i class="fa-brands fa-square-instagram"></i></a>
                 
             </div>
         </div>
-        <div  class="bg-gray-200 shadow-md text-black py-8 text-center">
+        <div  class="bg-blue-500 shadow-md text-white py-5 font-normal md:py-8 text-center md:font-medium">
             &copy; {{ year|default:"2025" }} Email Verifier. All rights reserved.
         </div>
         

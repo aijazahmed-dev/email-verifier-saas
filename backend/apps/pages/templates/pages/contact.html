@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Contact | Email Verifier{% endblock %}
+
+{% block content %}
+    <div class="max-w-[900px] mx-auto">
+        <h1 class="text-3xl font-black text-blue-950 pl-0 md:pl-50 text-center md:text-left md:text-4xl mt-10 mb-8 md:mb-0 md:mt-15">
+            Contact Us
+        </h1>
+
+        <div class="container-center flex flex-col items-center lg:flex-row">
+                <div class="mt-5 sm:w-auto lg:w-[650px] flex flex-col items-center text-left md:block">
+                    <form action="" method="POST" class="mx-auto p-6">
+                        {% csrf_token %}
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p class="text-[18px] text-center mt-3 mb-4
+                                {% if message.tags == 'success' %} text-green-600
+                                {% elif message.tags == 'error' %} text-red-600
+                                {% else %} text-blue-600 {% endif %}">
+                                {{ message }}
+                                </p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="flex flex-col items-center md:flex-row md:space-x-6">
+                            <div class="flex flex-col">
+                                <label class="block text-[20px] font-medium mb-2" for="name">Name</label>
+                                <input type="text" name="name" placeholder="Enter your full name"
+                                    class="w-70 p-3 mb-4 rounded-md border border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-800">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="block text-[20px] font-medium mb-2" for="email">Email</label>
+                                <input type="text" name="email" placeholder="Enter your email adress"
+                                    class="w-70 p-3 mb-4 rounded-md border border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-800">
+                            </div>
+                        </div>
+
+
+                        <label class="block text-[20px] text-left font-medium mb-2 mt-3" for="subject">Subject</label>
+                        <input type="text" name="subject" placeholder="What is this about?"
+                            class="w-70 md:w-147 p-3 mb-4 rounded-md border border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-800">
+                       
+                        <label class="block text-[20px] text-left font-medium mb-2 mt-3" for="message">Message</label>
+                        <textarea name="message" rows="4" placeholder="Your message here..."
+                            class="w-70 md:w-147 p-3 mb-4 rounded-md border border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-800"></textarea>
+                        <div class="flex items-center justify-center md:justify-start mb-15">
+                            <button type="submit"
+                                    class="bg-blue-500 text-white text-[16px] cursor-pointer rounded-lg h-12 w-45 mt-1 font-bold hover:bg-blue-800 hover:text-white transition duration-300 ease-in-out shadow-md hover:shadow-lg">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                   
+                <div class="flex flex-col mt-10 md:mt-17">
+                    <h3 class="text-[20px] font-bold">
+                        Or reach out directly
+                    </h3>
+                    <span class="text-[16px] mt-6 cursor-pointer hover:text-primary transition duration-300 ease-in-out">
+                        <i class="fa-solid fa-envelope text-blue-600 text-[18px] mr-2"></i>aijazahmed.coder@gmail
+                    </span>
+
+
+                    <span class="text-[15px] mt-4 cursor-pointer hover:text-primary transition duration-300 ease-in-out">
+                        <i class="fa-brands fa-square-whatsapp text-blue-600 text-[20px] mr-2"></i>(+92) 301-5706907
+                    </span>
+
+
+                    <div class="border-hidden pl-10 md:border-t md:border-solid md:border-[#204a4b] md:mt-15 md:pl-0">
+                        <h3 class="text-[20px] font-bold pt-6">
+                            Find me on
+                        </h3>
+
+
+                        <div class="mt-3 space-x-1 text-[21px]">
+                            <a href="#"><i class="fa-brands fa-github text-blue-500 hover:text-blue-900 transition duration-300 ease-in-out shadow-md"></i></a>
+                            <a href="#"><i class="fa-brands fa-square-linkedin text-blue-500 hover:text-blue-900 transition duration-300 ease-in-out shadow-md"></i></a>
+                            <a href="#"><i class="fa-brands fa-square-x-twitter text-blue-500 hover:text-blue-900 transition duration-300 ease-in-out shadow-md"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+{% endblock %}
