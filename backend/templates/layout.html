@@ -45,22 +45,24 @@
                 <li><a href="{% url 'home' %}" class="font-medium hover:text-blue-700 duration-300 {% if request.path == '/' %}text-blue-700{% else %}text-black{% endif %}">Home</a></li>
 
                 <li class="relative group">
-                    <a href="#" class="font-medium flex items-center hover:text-blue-700 duration-300 {% if request.path == '/tools/' %}text-blue-700{% else %}text-black{% endif %}">
+                    <a href="#" class="font-medium flex items-center hover:text-blue-700 duration-300">
                         Tools
                         <svg class="w-5 h-5 ml-1 text-current" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
                         </svg>
                     </a>
                     <ul class="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                        <li><a href="#" class="block px-4 py-2 hover:bg-blue-100">Email Verifier</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-blue-100">Other Tool</a></li>
+                        <li><a href="{% url 'emails_check' %}" class="block px-4 py-2 hover:bg-blue-100">Email Verifier</a></li>
+                        <li><a href="{% url 'bulk_csv_check' %}" class="block px-4 py-2 hover:bg-blue-100">Bulk Email Verifier</a></li>
+                        <li><a href="{% url 'email_sender' %}" class="block px-4 py-2 hover:bg-blue-100">Bulk Email Sender</a></li>
                     </ul>
                 </li>
 
                 <li><a href="{% url 'home' %}#pricing" class="font-medium hover:text-blue-700 duration-300">Pricing</a></li>
                 <li><a href="{% url 'contact' %}" class="font-medium hover:text-blue-700 duration-300 {% if request.path == '/contact/' %}text-blue-700{% else %}text-black{% endif %}">Contact</a></li>
-                <li><a href="#" class="font-medium border border-gray-500 px-3 py-1.5 rounded hover:bg-gray-300 duration-300">Sign in</a></li>
-                <li><a href="#" class="font-medium px-3 py-2 mt-4 md:mt-0 rounded text-white bg-blue-700 hover:bg-blue-400 duration-300">Sign up</a></li>
+                <li><a href="{% url 'dashboard' %}" class="font-medium hover:text-blue-700 duration-300 {% if request.path == '/dashboard/' %}text-blue-700{% else %}text-black{% endif %}">My Account</a></li>
+                <li><a href="{% url 'login' %}" class="font-medium border border-gray-500 px-3 py-1.5 rounded hover:bg-gray-300 duration-300">Sign in</a></li>
+                <li><a href="{% url 'register' %}" class="font-medium px-3 py-2 mt-4 md:mt-0 rounded text-white bg-blue-700 hover:bg-blue-400 duration-300">Sign up</a></li>
             </ul>
         </nav>
         <button id="mobile-menu-btn" class="md:hidden text-black text-2xl mr-4">

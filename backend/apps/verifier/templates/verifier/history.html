@@ -1,39 +1,54 @@
-<h2>Email Verification History</h2>
+{% extends 'layout.html' %}
+{% load static %}
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Email</th>
-        <th>Syntax Valid</th>
-        <th>Has MX</th>
-        <th>Disposable</th>
-        <th>Role</th>
-        <th>Deliverable</th>
-        <th>Time</th>
-    </tr>
-    {% for log in page_obj %}
-    <tr>
-        <td>{{ log.email }}</td>
-        <td>{{ log.syntax_valid|yesno:"Yes,No" }}</td>
-        <td>{{ log.has_mx|yesno:"Yes,No" }}</td>
-        <td>{{ log.is_disposable|yesno:"Yes,No" }}</td>
-        <td>{{ log.is_role|yesno:"Yes,No" }}</td>
-        <td>{{ log.deliverable|yesno:"Yes,No" }}</td>
-        <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="7">No history yet.</td></tr>
-    {% endfor %}
-</table>
+{% block title %}Email Verifier | Email Verifier{% endblock %}
 
-<!-- Pagination controls -->
-<div class="pagination">
-    {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-    {% endif %}
+{% block content %}
+    <h1 class="text-2xl md:text-3xl text-center mt-15 mb-12 font-bold md:font-black text-blue-950">Email Verification History</h1>
+    <div class="max-w-[1000px] mx-auto">
+        <table class="w-full border border-gray-300 border-collapse mt-6">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
+                    <th class="border border-gray-300 px-4 py-2">Syntax Valid</th>
+                    <th class="border border-gray-300 px-4 py-2">Has MX</th>
+                    <th class="border border-gray-300 px-4 py-2">Disposable</th>
+                    <th class="border border-gray-300 px-4 py-2">Role</th>
+                    <th class="border border-gray-300 px-4 py-2">Deliverable</th>
+                    <th class="border border-gray-300 px-4 py-2">Time</th>
+                </tr>
+            </thead>
 
-    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <tbody>
+                {% for log in page_obj %}
+                <tr class="hover:bg-gray-50">
+                    <td class="border border-gray-300 px-4 py-2">{{ log.email }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ log.syntax_valid|yesno:"Yes,No" }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ log.has_mx|yesno:"Yes,No" }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ log.is_disposable|yesno:"Yes,No" }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ log.is_role|yesno:"Yes,No" }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ log.deliverable|yesno:"Yes,No" }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                </tr>
+            </tbody>
+            {% empty %}
+            <tr><td colspan="7">No history yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next</a>
-    {% endif %}
-</div>
+    <!-- Pagination controls -->
+    <div class="pagination max-w-[1000px] mx-auto">
+        <div class="py-6 flex justify-between w-full">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="py-2 px-4 cursor-pointer font-medium rounded bg-blue-700 text-white hover:bg-blue-400 duration-300">Previous</a>
+            {% endif %}
+
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="py-2 px-4 cursor-pointer font-medium rounded bg-blue-700 text-white hover:bg-blue-400 duration-300">Next</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

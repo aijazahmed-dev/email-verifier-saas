@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
@@ -8,8 +8,7 @@ from django.utils.encoding import force_bytes
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
 from django.contrib.auth.models import User
 
 
@@ -70,13 +69,15 @@ def activate(request, uidb64, token):
 # Log In View
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+
+            next_url = request.POST.get('next') or request.GET.get('next')
+            return redirect(next_url or 'emails_check')
     else:
-        form = AuthenticationForm()
+        form = CustomAuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
 
 

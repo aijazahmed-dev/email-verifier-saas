@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Tools | Email Verifier{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-black text-blue-950 text-center md:text-4xl mt-20 mb-8 md:mb-0 md:mt-15">
+        My Account
+    </h1>
+    <div class="max-w-[800px] h-80 bg-white shadow mx-auto flex justify-center my-20">
+        <div class="flex justify-around border-b border-gray-300 w-full h-18 pt-5">
+            <a href="{% url 'verification_history' %}" class="text-[18px] text-blue-900 font-medium hover:text-blue-700 duration-300">History</a>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="py-2 px-4 cursor-pointer font-medium rounded bg-blue-700 text-white hover:bg-blue-400 duration-300">Logout</button>
+                </form> 
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

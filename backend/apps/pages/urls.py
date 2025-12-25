@@ -8,4 +8,5 @@ urlpatterns = [
     path('privacy/', views.privacy, name='privacy'),
     path('contact/', views.contact, name='contact'),
     path('cookie/', views.cookie, name='cookie'),
+    path('email-sender/', views.email_sender, name='email_sender'),
 ]

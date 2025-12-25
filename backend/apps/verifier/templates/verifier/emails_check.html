@@ -1,51 +1,78 @@
-<h2>Email Verification Tool</h2>
-<p>Plan: {{ request.user.userplan.plan.name }}<p>
-<p>Remaining Credits: {{ request.user.userplan.credits_remaining }}<p>
-{% if request.user.userplan.plan.is_monthly %}
-    <p>Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</p>
-{% endif %}
+{% extends 'layout.html' %}
+{% load static %}
 
-<form method="post">
-    {% csrf_token %}
-    <textarea name="emails" rows="5" placeholder="Enter one or more emails, separated by comma, space, or new line">{{ emails_input }}</textarea>
-    <br>
-    <button type="submit">Verify</button>
-</form>
+{% block title %}Email Verifier | Email Verifier{% endblock %}
 
-{% if results %}
-    <h3>Verification Results:</h3>
-    <table border="1" cellpadding="5">
-        <tr>
-            <th>Email</th>
-            <th>Syntax Valid</th>
-            <th>Has MX</th>
-            <th>Disposable</th>
-            <th>Role Account</th>
-            <th>Can Receive Email</th>
-        </tr>
-        {% for r in page_obj %}
-        <tr>
-            <td>{{ r.email }}</td>
-            <td>{{ r.syntax_valid }}</td>
-            <td>{{ r.has_mx }}</td>
-            <td>{{ r.is_disposable }}</td>
-            <td>{{ r.is_role }}</td>
-            <td>{{ r.deliverable }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-{% endif %}
+{% block content %}
+  <h1 class="text-2xl md:text-3xl text-center mt-15 mb-12 font-bold md:font-black text-blue-950">Email Verification Tool</h1>
+  <div class="max-w-[900px] mb-20 h-auto md:h-40 flex bg-white shadow flex-col md:flex-row justify-evenly md:items-center mx-auto">
+    <div class="w-60 h-22 bg-green-100 rounded">
+      <h2 class="text-[16px] text-center font-medium text-green-700 py-8">Your Tier: {{ request.user.userplan.plan.name }}</h2>
+    </div>
+    <div class="w-60 h-22 bg-orange-100 rounded">
+      <h2 class="text-[16px] text-center font-medium text-orange-500 py-8">Remaining Credits: {{ request.user.userplan.credits_remaining }}</h2>
+    </div>
+    {% if request.user.userplan.plan.is_monthly %}
+      <div class="w-60 h-22 bg-blue-100 rounded">
+        <h2 class="text-[16px] text-center font-medium text-blue-700 py-8">Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</h2>
+      </div>
+    {% endif %}
+  </div>
 
-<!-- Pagination controls -->
-<div class="pagination">
-  {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+  <div class="max-w-[900px] mx-auto mb-60">
+    <form method="post" class="w-full">
+        {% csrf_token %}
+        <textarea name="emails" rows="6" placeholder="Enter one or more emails, separated by comma, space, or new line" class="w-full border border-gray-400 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-800">{{ emails_input }}</textarea>
+        <br>
+        <button type="submit" class="text-center bg-blue-700 text-white py-2 cursor-pointer mt-3 w-full font-medium rounded hover:bg-blue-400 duration-300">Verify Emails</button>
+    </form>
+
+    {% if results %}
+      <h3 class="text-2xl font-bold text-center text-blue-950 mt-15 mb-3">Verification Results</h3>
+      <table class="w-full border border-gray-300 border-collapse mt-6">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
+            <th class="border border-gray-300 px-4 py-2">Syntax Valid</th>
+            <th class="border border-gray-300 px-4 py-2">Has MX</th>
+            <th class="border border-gray-300 px-4 py-2">Disposable</th>
+            <th class="border border-gray-300 px-4 py-2">Role Account</th>
+            <th class="border border-gray-300 px-4 py-2">Deliverable</th>
+          </tr>
+        </thead>
+          
+        <tbody>
+          {% for r in page_obj %}
+            <tr class="hover:bg-gray-50">
+              <td class="border border-gray-300 px-4 py-2">{{ r.email }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">{{ r.syntax_valid }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">{{ r.has_mx }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">{{ r.is_disposable }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">{{ r.is_role }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">{{ r.deliverable }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    {% endif %}
+  </div>
+  
+
+  <!-- Pagination controls -->
+  {% if page_obj %}
+    <div class="max-w-[900px] mx-auto">
+      <div class="py-6 flex justify-between w-full">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="py-2 px-4 cursor-pointer font-medium rounded bg-blue-700 text-white hover:bg-blue-400 duration-300">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="py-2 px-4 cursor-pointer font-medium rounded bg-blue-700 text-white hover:bg-blue-400 duration-300">Next</a>
+        {% endif %}
+      </div>
+    </div>
   {% endif %}
-
-  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">Next</a>
-  {% endif %}
-</div>
+{% endblock %}
 

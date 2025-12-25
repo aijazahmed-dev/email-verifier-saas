@@ -1,14 +1,42 @@
-<h2>Log In</h2>
+{% extends 'layout.html' %}
+{% load static %}
 
-<form method="POST" action="{% url 'login' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Log In</button>
-</form>
+{% block title %}Login | Email Verifier{% endblock %}
 
-<p>
-    Are you a new user? <a href="{% url 'register' %}">Register</a>
-</p>
-<p>
-    <a href="{% url 'password_reset' %}">Forgot your password?</a>
-</p>
+{% block content %}
+    <h2 class="text-2xl font-bold mb-6 text-center">Log In</h2>
+    <form method="POST" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        {% csrf_token %}
+
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        
+        {% if form.non_field_errors %}
+            <div class="mb-4 text-red-600 text-sm text-center">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <!-- Username -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Username</label>
+            {{ form.username }}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Password</label>
+            {{ form.password }}
+        </div>
+
+        <p class="text-center mt-7 mb-4">
+            <a href="{% url 'password_reset' %}" class="text-blue-600 underline">Forgot your password?</a>
+        </p>
+        <button type="submit"
+            class="w-full bg-blue-600 text-white cursor-pointer py-2 rounded hover:bg-blue-700 transition">
+            Login
+        </button>
+    </form>
+    <p class="text-center mt-4 mb-20">
+        <a href="{% url 'register' %}" class="text-blue-600 underline">Not a member yet? Register now.</a>
+    </p>
+{% endblock %}

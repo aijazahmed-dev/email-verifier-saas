@@ -1,2 +1,14 @@
-<h2>Registration Successful</h2>
-<p>A confirmation email has been sent to your inbox. Please check your email and verify your account.</p>
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Registration | Email Verifier{% endblock %}
+
+{% block content %}
+    <div class="max-w-[900px] h-full mx-auto flex justify-center">
+        <div class="bg-white shadow w-auto md:w-120 h-70 mb-30 mt-15 flex flex-col justify-center items-center">
+            <i class="fa-solid fa-clipboard-check text-6xl text-green-600 mb-4"></i>
+            <h2 class="text-green-600 text-center px-4 text-[18px] font-medium md:text-[20px] md:font-bold">Registration Successful</h2>
+            <p class="text-blue-600 text-center text-[14px] md:text-[16px] px-6 font-normal md:font-medium pt-3">A confirmation email has been sent to your registered email. Please check your inbox and verify your account.</p>
+        </div>
+    </div>
+{% endblock %}

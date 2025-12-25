@@ -1,9 +1,70 @@
-<h2>Register</h2>
+{% extends 'layout.html' %}
+{% load static %}
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
+{% block title %}Register | Email Verifier{% endblock %}
 
-<p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+{% block content %}
+    <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
+    <form method="POST" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="mb-4 text-red-600 text-sm text-center">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <!-- Username -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="text-red-500 text-sm">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-4">
+            <label for="{{ form.email.id_for_label }}"class="block text-sm font-medium mb-1">Email address</label>
+
+            {{ form.email }}
+
+            {% if form.email.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                    {{ form.email.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Password</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="text-red-500 text-sm">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Confirm Password</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="text-red-500 text-sm">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit"
+            class="w-full bg-blue-600 text-white cursor-pointer py-2 rounded hover:bg-blue-700 transition">
+            Register
+        </button>
+    </form>
+
+    <p class="text-center mt-4 mb-20">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-blue-600 underline">Login</a>
+    </p>
+
+{% endblock %}
+
+

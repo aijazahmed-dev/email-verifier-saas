@@ -18,6 +18,9 @@ def privacy(request):
 def cookie(request):
     return render(request, 'pages/cookie.html')
 
+def email_sender(request):
+    return render(request, 'pages/email_sender.html')
+
 def contact(request):
     if request.method == "POST":
         name = request.POST.get('name')

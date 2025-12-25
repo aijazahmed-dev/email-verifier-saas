@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import UploadCSVForm
@@ -9,6 +9,10 @@ from django_ratelimit.decorators import ratelimit
 from .engine.verify_engine import verify, normalize_email, map_to_yes_no
 from .models import EmailVerificationLog, UserPlan
 from .utils_plans import reset_user_credits
+from django.conf import settings
+from django.http import FileResponse, Http404
+import os
+import uuid
 
 # Create your views here.
 @login_required
@@ -33,6 +37,17 @@ def emails_check(request):
     results = []
     emails_input = ""
 
+    # Retrieve previous results from session (if any)
+    results = request.session.pop('results', [])
+    emails_input = request.session.pop('emails_input', "")
+
+    page_obj = None
+
+    if results:
+        page_number = request.GET.get('page', 1)
+        paginator = Paginator(results, 10)
+        page_obj = paginator.get_page(page_number)
+        
     if request.method == "POST":
         emails_input = request.POST.get("emails", "")
         
@@ -58,23 +73,21 @@ def emails_check(request):
         "deliverable": map_to_yes_no(result["deliverable"]),
 
         })
-            
-        # Pagination
-        page_number = request.GET.get('page', 1)  # get page from URL, default 1
-        paginator = Paginator(results, 10)        # 10 results per page
-        page_obj = paginator.get_page(page_number)
 
             
-        # Save to logs
-        EmailVerificationLog.objects.create(
-            user=request.user,
-            email=email,
-            syntax_valid=result["syntax_valid"],
-            has_mx=result["has_mx"],
-            is_disposable=result["is_disposable"],
-            is_role=result["is_role"],
-            deliverable=result["deliverable"]
-        )
+            # Save to logs
+            EmailVerificationLog.objects.create(
+                user=request.user,
+                email=email,
+                syntax_valid=result["syntax_valid"],
+                has_mx=result["has_mx"],
+                is_disposable=result["is_disposable"],
+                is_role=result["is_role"],
+                deliverable=result["deliverable"]
+            )
+
+        request.session['results'] = results
+        request.session['emails_input'] = emails_input
 
         # Deduct credits after verifiying emails
         user_plan.credits_remaining -= len(emails)
@@ -85,9 +98,12 @@ def emails_check(request):
 
         user_plan.save()
 
+        return redirect('emails_check')
+
     return render(request, "verifier/emails_check.html", {
         "emails_input": emails_input,
-        "page_obj": page_obj
+        "page_obj": page_obj,
+        "results": results
     })
 
 
@@ -97,12 +113,13 @@ def emails_check(request):
 def bulk_csv_check_view(request):
     user_plan = UserPlan.objects.get(user=request.user)
     
+    bulk_result_file = request.session.get('bulk_result_file', None)
+
     today = timezone.now().date()
     
     # Reset daily + monthly credits
     reset_user_credits(user_plan)
 
-    results = []
     form = UploadCSVForm()
     
     if request.method == "POST":
@@ -151,7 +168,7 @@ def bulk_csv_check_view(request):
                 # Save to logs
                 EmailVerificationLog.objects.create(
                 user=request.user,
-                email=email,
+                email=email_norm,
                 syntax_valid=result["syntax_valid"],
                 has_mx=result["has_mx"],
                 is_disposable=result["is_disposable"],
@@ -159,10 +176,17 @@ def bulk_csv_check_view(request):
                 deliverable=result["deliverable"]
                 )
             
-            # Save results for download
+            # Save results
             df_result = pd.DataFrame(data)
-            request.session['bulk_results'] = df_result.to_json()  # store temporarily in session
-            results = data
+
+            filename = f"bulk_results_{request.user.id}_{uuid.uuid4().hex}.csv"
+            file_path = os.path.join(settings.MEDIA_ROOT, "bulk_results", filename)
+
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            df_result.to_csv(file_path, index=False)
+
+            # store file path for download
+            request.session['bulk_result_file'] = filename
 
             # Deduct credits after verifiying emails
             user_plan.credits_remaining -= len(emails)
@@ -173,23 +197,34 @@ def bulk_csv_check_view(request):
 
             user_plan.save()
 
+            return redirect('bulk_csv_check')
+
     return render(request, "verifier/bulk_csv_check.html", {
         "form": form,
-        "results": results
+        "bulk_result_file": bulk_result_file,
     })
 
 
 # Download processed CSV
+@login_required
 def download_bulk_results(request):
-    json_data = request.session.get('bulk_results')
-    if not json_data:
-        return HttpResponse("No results to download.", status=400)
-    
-    df = pd.read_json(json_data)
-    
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="email_verification_results.csv"'
-    df.to_csv(path_or_buf=response, index=False)
+    filename = request.session.get('bulk_result_file')
+    if not filename:
+        return HttpResponse("No file to download.", status=400)
+
+    file_path = os.path.join(settings.MEDIA_ROOT, "bulk_results", filename)
+
+    if not os.path.exists(file_path):
+        raise Http404("File not found.")
+
+    response = FileResponse(
+        open(file_path, 'rb'),
+        as_attachment=True,
+        filename=filename
+    )
+
+    request.session.pop('bulk_result_file', None)
+
     return response
 
 # View to list the logs for the logged-in user

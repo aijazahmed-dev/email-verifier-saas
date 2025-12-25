@@ -1,18 +1,46 @@
-<h2>Bulk Email Verification</h2>
-<p>Plan: {{ request.user.userplan.plan.name }}<p>
-<p>Remaining Credits: {{ request.user.userplan.credits_remaining }}<p>
-{% if request.user.userplan.plan.is_monthly %}
-    <p>Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</p>
-{% endif %}
+{% extends 'layout.html' %}
+{% load static %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Verify Emails</button>
-</form>
+{% block title %}Email Verifier | Email Verifier{% endblock %}
 
-{% if results %}
-    <h3>Results:</h3>
-    <a href="{% url 'download_bulk_results' %}">Download CSV</a>
-{% endif %}
+{% block content %}
+    <h1 class="text-2xl md:text-3xl text-center mt-15 mb-12 font-bold md:font-black text-blue-950">Bulk Email Verification</h1>
+    <div class="max-w-[900px] mb-20 h-auto md:h-40 flex bg-white shadow flex-col md:flex-row justify-evenly md:items-center mx-auto">
+        <div class="w-60 h-22 bg-green-100 rounded">
+            <h2 class="text-[16px] text-center font-medium text-green-700 py-8">Your Tier: {{ request.user.userplan.plan.name }}</h2>
+        </div>
+
+        <div class="w-60 h-22 bg-orange-100 rounded">
+            <h2 class="text-[16px] text-center font-medium text-orange-500 py-8">Remaining Credits: {{ request.user.userplan.credits_remaining }}</h2>
+        </div>
+        {% if request.user.userplan.plan.is_monthly %}
+        <div class="w-60 h-22 bg-blue-100 rounded">
+            <h2 class="text-[16px] text-center font-medium text-blue-700 py-8">Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</h2>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="max-w-[900px] mx-auto mb-60">
+        <form method="post" enctype="multipart/form-data" class="w-full">
+            {% csrf_token %}
+            
+            <div class="flex justify-center">
+                <label class="flex items-center gap-2 w-full h-20 cursor-pointer border border-gray-400 bg-white text-gray-700 px-90 py-7 rounded-md hover:bg-gray-200">
+                    <i class="fa-solid fa-cloud-arrow-up text-blue-500 text-3xl"></i>
+                    <span class="font-medium">Upload a CSV file</span>
+                    <input type="file" name="file" accept=".csv" class="hidden">
+                </label>
+            </div>
+
+            <button type="submit" class="text-center bg-blue-700 text-white py-2 cursor-pointer mt-3 w-full font-medium rounded hover:bg-blue-400 duration-300">Verify Emails</button>
+        </form>
+
+        {% if bulk_result_file %}
+            <h3 class="text-2xl font-bold text-center text-blue-950 mt-15 mb-3">Download Results File</h3>
+            <div class="w-full h-auto flex justify-center">
+                <a href="{% url 'download_bulk_results' %}" class="bg-green-600 text-white font-medium py-3 px-6 rounded hover:bg-blue-500 duration-300">Download File</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
 
