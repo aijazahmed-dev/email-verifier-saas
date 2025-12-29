@@ -28,7 +28,6 @@ data/
 *.tmp
 *.temp
 .cache/
-docker-compose.yml
 media/
 staticfiles/
 node_modules

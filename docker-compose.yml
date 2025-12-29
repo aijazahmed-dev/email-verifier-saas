@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16
+    container_name: email_verifier_db
+    restart: always
+    environment:
+      POSTGRES_DB: email_verifier
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres@db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: email_verifier_web
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/email_verifier
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        gunicorn core.wsgi:application --bind 0.0.0.0:8000
+      "
+
+volumes:
+  postgres_data:

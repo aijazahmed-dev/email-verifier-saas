@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator
 from django_ratelimit.decorators import ratelimit
 from .engine.verify_engine import verify, normalize_email, map_to_yes_no
-from .models import EmailVerificationLog, UserPlan
+from .models import EmailVerificationLog, Plan, UserPlan
 from .utils_plans import reset_user_credits
 from django.conf import settings
 from django.http import FileResponse, Http404
@@ -18,7 +18,13 @@ import uuid
 @login_required
 @ratelimit(key='user', rate='10/m', block=True)
 def emails_check(request):
-    user_plan = UserPlan.objects.get(user=request.user)
+    user_plan, _ = UserPlan.objects.get_or_create(
+    user=request.user,
+    defaults={
+        "plan": Plan.objects.get(name="Free"),
+        "credits_remaining": 50,
+    }
+)
     
     today = timezone.now().date()
 
@@ -58,6 +64,10 @@ def emails_check(request):
         if user_plan.plan.daily_limit > 0 and user_plan.daily_used + len(emails) > user_plan.plan.daily_limit:
             return HttpResponse("Daily limit reached.", status=429)
         
+        # Check Montly limit
+        if user_plan.plan.monthly_limit > 0 and user_plan.monthly_used + len(emails) > user_plan.plan.monthly_limit:
+            return HttpResponse("Monthly limit reached.", status=429)
+        
         # Check if user has enough credits
         if len(emails) > user_plan.credits_remaining:
             return HttpResponse("Not enough credits.", status=402)
@@ -96,6 +106,10 @@ def emails_check(request):
         if user_plan.plan.daily_limit > 0:
             user_plan.daily_used += len(emails)
 
+        # Count monthly usage
+        if user_plan.plan.monthly_limit > 0:
+            user_plan.monthly_used += len(emails)
+
         user_plan.save()
 
         return redirect('emails_check')
@@ -111,7 +125,13 @@ def emails_check(request):
 @login_required
 @ratelimit(key='user', rate='6/m', block=True)
 def bulk_csv_check_view(request):
-    user_plan = UserPlan.objects.get(user=request.user)
+    user_plan, _ = UserPlan.objects.get_or_create(
+    user=request.user,
+    defaults={
+        "plan": Plan.objects.get(name="Free"),
+        "credits_remaining": 50,
+    }
+)
     
     bulk_result_file = request.session.get('bulk_result_file', None)
 
@@ -146,6 +166,10 @@ def bulk_csv_check_view(request):
             # Check daily limit
             if user_plan.plan.daily_limit > 0 and user_plan.daily_used + len(emails) > user_plan.plan.daily_limit:
                 return HttpResponse("Daily limit reached.", status=429)
+            
+            # Check Montly limit
+            if user_plan.plan.monthly_limit > 0 and user_plan.monthly_used + len(emails) > user_plan.plan.monthly_limit:
+                return HttpResponse("Monthly limit reached.", status=429)
             
             # Check if user has enough credits
             if len(emails) > user_plan.credits_remaining:
@@ -194,6 +218,10 @@ def bulk_csv_check_view(request):
             # Count daily usage (only free plan)
             if user_plan.plan.daily_limit > 0:
                 user_plan.daily_used += len(emails)
+
+            # Count monthly usage
+            if user_plan.plan.monthly_limit > 0:
+                user_plan.monthly_used += len(emails)
 
             user_plan.save()
 

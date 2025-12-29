@@ -23,6 +23,7 @@ class Plan(models.Model):
     credits = models.IntegerField(default=0)
     is_monthly = models.BooleanField(default=False)  # Free plan = True
     daily_limit = models.IntegerField(default=0)  # Free plan = 20, others = 0 (no limit)
+    monthly_limit = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -33,9 +34,21 @@ class UserPlan(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, null=True)
     credits_remaining = models.IntegerField(default=0)
     daily_used = models.IntegerField(default=0)
+    monthly_used = models.IntegerField(default=0)
     last_daily_reset = models.DateField(default=timezone.now)
     last_monthly_reset = models.DateField(default=timezone.now)
     expiry_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.plan.name}"
+    
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = UserPlan.objects.get(pk=self.pk)
+            if old.plan != self.plan:
+                self.credits_remaining = self.plan.credits
+        else:
+            if self.plan:
+                self.credits_remaining = self.plan.credits
+
+        super().save(*args, **kwargs)

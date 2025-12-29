@@ -12,6 +12,13 @@ def reset_user_credits(user_plan):
             user_plan.daily_used = 0
             user_plan.last_daily_reset = today
 
+    # Reset monthly usage for all plans with monthly_limit
+    if user_plan.plan.monthly_limit > 0:
+        if (user_plan.last_monthly_reset.month != today.month or 
+            user_plan.last_monthly_reset.year != today.year):
+            user_plan.monthly_used = 0
+            user_plan.last_monthly_reset = today
+
     # Reset monthly usage (Free plan only)
     if user_plan.plan.is_monthly:
         if user_plan.last_monthly_reset.month != today.month:

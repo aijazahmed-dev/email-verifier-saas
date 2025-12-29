@@ -5,21 +5,22 @@
 
 {% block content %}
   <h1 class="text-2xl md:text-3xl text-center mt-15 mb-12 font-bold md:font-black text-blue-950">Email Verification Tool</h1>
-  <div class="max-w-[900px] mb-20 h-auto md:h-40 flex bg-white shadow flex-col md:flex-row justify-evenly md:items-center mx-auto">
-    <div class="w-60 h-22 bg-green-100 rounded">
+  <div class="max-w-[1100px] mb-20 h-130 md:h-40 flex bg-white shadow flex-col items-center md:flex-row justify-evenly mx-auto">
+    <div class="w-60 h-24 bg-green-100 rounded">
       <h2 class="text-[16px] text-center font-medium text-green-700 py-8">Your Tier: {{ request.user.userplan.plan.name }}</h2>
     </div>
-    <div class="w-60 h-22 bg-orange-100 rounded">
+    <div class="w-60 h-24 bg-orange-100 rounded">
       <h2 class="text-[16px] text-center font-medium text-orange-500 py-8">Remaining Credits: {{ request.user.userplan.credits_remaining }}</h2>
     </div>
-    {% if request.user.userplan.plan.is_monthly %}
-      <div class="w-60 h-22 bg-blue-100 rounded">
+    <div class="w-60 h-24 bg-purple-100 rounded">
+        <h2 class="text-[16px] text-center font-medium text-purple-700 py-8">Monthly usage: {{ request.user.userplan.monthly_used }}/{{ request.user.userplan.plan.monthly_limit }} credits</h2>
+    </div>
+      <div class="w-60 h-24 bg-blue-100 rounded">
         <h2 class="text-[16px] text-center font-medium text-blue-700 py-8">Daily usage: {{ request.user.userplan.daily_used }}/{{ request.user.userplan.plan.daily_limit }} credits</h2>
       </div>
-    {% endif %}
   </div>
 
-  <div class="max-w-[900px] mx-auto mb-60">
+  <div class="max-w-[1100px] mx-auto mb-60">
     <form method="post" class="w-full">
         {% csrf_token %}
         <textarea name="emails" rows="6" placeholder="Enter one or more emails, separated by comma, space, or new line" class="w-full border border-gray-400 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-800">{{ emails_input }}</textarea>

@@ -9,8 +9,7 @@ venv/
 .git/
 .gitignore
 *.sqlite3
-.env
-.conda\
+.conda/
 .cache/
 .DS_Store
 Thumbs.db
@@ -18,3 +17,4 @@ node_modules/
 media/
 staticfiles/
 *.sqlite3
+docs/
