@@ -90,6 +90,7 @@ The system validates emails using multiple industry-standard checks:
 ---
 
 ## 🗂 Project Structure
+```
 backend/
 ├── core/
 │ ├── settings.py
@@ -109,8 +110,9 @@ backend/
 │ └── dist/
 │ └── styles.css
 │
-├── staticfiles/ # collectstatic output
+├── staticfiles/  collectstatic output
 ├── manage.py
+```
 
 ## ⚙️ Installation & Setup
 
@@ -118,7 +120,7 @@ backend/
 
 ### 2️⃣ Create virtual environment
 python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
+source venv/bin/activate    Windows: venv\Scripts\activate
 
 ### 3️⃣ Install dependencies
 pip install -r requirements.txt
@@ -183,5 +185,7 @@ python manage.py runserver
 - Can be sold or deployed for recurring revenue
 
 ## 👨‍💻 Author
+```
 **Aijaz Ahmed**
 Python Developer | Backend Engineer
+```
