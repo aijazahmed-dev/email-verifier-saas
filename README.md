@@ -185,7 +185,8 @@ python manage.py runserver
 - Can be sold or deployed for recurring revenue
 
 ## 👨‍💻 Author
-```
+
 **Aijaz Ahmed**
+```
 Python Developer | Backend Engineer
 ```
